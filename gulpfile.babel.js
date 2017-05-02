@@ -6,8 +6,8 @@ import rename from 'gulp-rename';
 import istanbul from 'gulp-istanbul';
 import coveralls from 'gulp-coveralls';
 
-gulp.task('pre-test', () => {
-  return gulp.src('src/*.js')
+gulp.task('pre-test', ['babelifySrcFiles'], () => {
+  return gulp.src('dist/*.js')
   // Covering files
   .pipe(istanbul({ includeUntested: true }))
   // Force `require` to return covered files
@@ -17,14 +17,16 @@ gulp.task('pre-test', () => {
 gulp.task('run-tests', ['pre-test'], () => {
   return gulp.src('tests/*.js')
   .pipe(babel({
-    presets: ['es2015']
+    presets: ['es2015'],
+    plugins: ['transform-object-rest-spread']
   }))
   // Run test assertions with jasmine-node
   .pipe(jasmineNode({
     timeout: 10000,
     includeStackTrace: true,
     color: true
-  }));
+  }))
+  .pipe(istanbul.writeReports());
 });
 
 gulp.task('babelifyTestFiles', () => {
@@ -68,10 +70,6 @@ gulp.task('serve', () => {
 });
 
 gulp.task('coverage', ['run-tests'], () => {
-  return gulp.src('tests/*.js')
-  .pipe(istanbul.writeReports())
-  .on('end', () => {
-    gulp.src('coverage/lcov.info')
-    .pipe(coveralls());
-  });
+  return gulp.src('coverage/lcov.info')
+  .pipe(coveralls());
 });
