@@ -7,7 +7,9 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "coverage": "gulp coverage",
+    "test": "gulp run-tests",
+    "transpile": "gulp babelifySrcFiles && gulp babelifyTestFiles"
   },
   "repository": {
     "type": "git",
@@ -31,10 +33,12 @@
   "babel": {
     "presets": [
       "es2015"
-    ]
+    ],
+    "plugins": ["transform-object-rest-spread"]
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "babel-preset-es2015": "^6.24.1",
     "dotenv": "^4.0.0",
     "eslint": "^3.19.0",
@@ -42,6 +46,9 @@
     "eslint-plugin-import": "^2.2.0",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
+    "gulp-cli": "^1.3.0",
+    "gulp-coveralls": "^0.1.4",
+    "gulp-istanbul": "^1.1.1",
     "gulp-jasmine": "^2.4.2",
     "gulp-jasmine-node": "^1.0.7",
     "gulp-nodemon": "^2.2.1",
