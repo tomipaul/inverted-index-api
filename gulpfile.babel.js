@@ -7,7 +7,7 @@ import istanbul from 'gulp-istanbul';
 import coveralls from 'gulp-coveralls';
 
 gulp.task('pre-test', () => {
-  return gulp.src('dist/*.js')
+  return gulp.src('src/*.js')
   // Covering files
   .pipe(istanbul({ includeUntested: true }))
   // Force `require` to return covered files
@@ -15,7 +15,10 @@ gulp.task('pre-test', () => {
 });
 
 gulp.task('run-tests', ['pre-test'], () => {
-  return gulp.src('spec/*.js')
+  return gulp.src('tests/*.js')
+  .pipe(babel({
+    presets: ['es2015']
+  }))
   // Run test assertions with jasmine-node
   .pipe(jasmineNode({
     timeout: 10000,
@@ -53,7 +56,7 @@ gulp.task('babelifySrcFiles', () => {
 gulp.task('serve', () => {
   nodemon({
     script: 'dist/app.js',
-    ext: 'js json',
+    ext: 'js json html',
     ignore: [
       'node_modules/',
       '.vscode/',
@@ -65,7 +68,7 @@ gulp.task('serve', () => {
 });
 
 gulp.task('coverage', ['run-tests'], () => {
-  return gulp.src('spec/*.js')
+  return gulp.src('tests/*.js')
   .pipe(istanbul.writeReports())
   .on('end', () => {
     gulp.src('coverage/lcov.info')
