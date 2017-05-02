@@ -7,8 +7,7 @@
     "test": "tests"
   },
   "scripts": {
-    "coverage": "gulp coverage",
-    "test": "gulp run-tests",
+    "test": "gulp coverage",
     "transpile": "gulp babelifySrcFiles && gulp babelifyTestFiles"
   },
   "repository": {
