@@ -1,0 +1,5 @@
+# Ignore transpiled files
+# 'dist/' contains transpiled 'src/' files
+# 'spec/' contains transpiled 'test/' files 
+dist/*.js
+spec/*.js
