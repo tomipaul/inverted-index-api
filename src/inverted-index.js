@@ -10,7 +10,7 @@ class InvertedIndex {
 
   /**
    * assert fileContent is a non-empty valid JSON array
-   * @param {*} fileContent - Content of uploaded file
+   * @param {array} fileContent - Content of uploaded file
    * @returns {array.Boolean.<true>} [true] if fileContent is valid
    * @returns {array} [false, invalid|empty|if fileContent is Invalid
    */
