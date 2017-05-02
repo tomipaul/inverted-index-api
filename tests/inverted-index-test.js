@@ -1,4 +1,4 @@
-import InvertedIndex from '../dist/inverted-index';
+import InvertedIndex from '../src/inverted-index';
 import someMalformedBooks from '../fixtures/someMalformedBooks.json';
 import emptyFile from '../fixtures/emptyFile.json';
 import emptyObject from '../fixtures/emptyObject.json';
