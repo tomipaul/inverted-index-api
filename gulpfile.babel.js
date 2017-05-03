@@ -3,11 +3,12 @@ import jasmineNode from 'gulp-jasmine-node';
 import nodemon from 'gulp-nodemon';
 import babel from 'gulp-babel';
 import rename from 'gulp-rename';
-import istanbul from 'gulp-istanbul';
+import istanbul from 'gulp-babel-istanbul';
+import injectModules from 'gulp-inject-modules';
 import coveralls from 'gulp-coveralls';
 
-gulp.task('pre-test', ['babelifySrcFiles'], () => {
-  return gulp.src('dist/*.js')
+gulp.task('pre-test', () => {
+  return gulp.src('src/*.js')
   // Covering files
   .pipe(istanbul({ includeUntested: true }))
   // Force `require` to return covered files
@@ -15,11 +16,12 @@ gulp.task('pre-test', ['babelifySrcFiles'], () => {
 });
 
 gulp.task('run-tests', ['pre-test'], () => {
-  return gulp.src('tests/*.js')
+  return gulp.src('tests/inverted-index-test.js')
   .pipe(babel({
     presets: ['es2015'],
     plugins: ['transform-object-rest-spread']
   }))
+  .pipe(injectModules())
   // Run test assertions with jasmine-node
   .pipe(jasmineNode({
     timeout: 10000,
