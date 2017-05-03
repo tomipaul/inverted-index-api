@@ -33,7 +33,9 @@
     "presets": [
       "es2015"
     ],
-    "plugins": ["transform-object-rest-spread"]
+    "plugins": [
+      "transform-object-rest-spread"
+    ]
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
@@ -45,8 +47,10 @@
     "eslint-plugin-import": "^2.2.0",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
+    "gulp-babel-istanbul": "^1.6.0",
     "gulp-cli": "^1.3.0",
     "gulp-coveralls": "^0.1.4",
+    "gulp-inject-modules": "^1.0.0",
     "gulp-istanbul": "^1.1.1",
     "gulp-jasmine": "^2.4.2",
     "gulp-jasmine-node": "^1.0.7",
