@@ -30,6 +30,7 @@ class InvertedIndex {
    * [false, 'malformed', malformedObjects] if some are malformed
    */
   static checkBooks(fileContent) {
+    // to be name checkFileContent
     const malformedObjs = fileContent.reduce((acc, book, bookIndex) => {
       return (typeof book === 'object') ?
       this.checkBook(acc, book, bookIndex) :
@@ -47,15 +48,18 @@ class InvertedIndex {
    * @returns {array} - acc = [] | acc = [bookIndex]
    */
   static checkBook(acc, book, bookIndex) {
+    // to be named checkBookObject
     /* fileObj should have two keys - title and text
     title and text should be non-empty strings */
     const bookKeys = Object.keys(book);
     return (bookKeys.length === 2 &&
     bookKeys.includes('title') &&
     book.title &&
+    !/^(\s*|\W*)$/.test(book.title) &&
     typeof book.title === 'string' &&
     bookKeys.includes('text') &&
     book.text &&
+    !/^(\s*|\W*)$/.test(book.text) &&
     typeof book.text === 'string') ?
     acc : (acc.push(bookIndex), acc);
   }
@@ -79,7 +83,9 @@ class InvertedIndex {
   }
 
   /**
-   * flattens array
+   * flattens an array
+   * @method flattenArray
+   * @static
    * @param {array} nestedArray -A multidimensional array
    * @returns {array} -A one dimensional array
    */
@@ -141,7 +147,7 @@ class InvertedIndex {
         // for each book in the file, analyse
         InvertedIndex.analyse(book).forEach((token) => {
           // for each token in analysed book text, check and update `indexes`
-          if (Object.prototype.hasOwnProperty.call(index, token)) {
+          if (token && Object.prototype.hasOwnProperty.call(index, token)) {
             if (!index[token].includes(bookIndex)) {
               index[token].push(bookIndex);
             }
@@ -151,18 +157,9 @@ class InvertedIndex {
         });
       });
       this.indexes[fileName] = index;
-      return { ...index };
+      return { ...this.indexes };
     }
     return (!nameIsValid) ? [false, 'File name Invalid'] : contentIsValid;
-  }
-
-  /**
-   * gets the index object created from 'filename'
-   * @param {string} fileName -Name of file
-   * @returns {Object} -A mapping of words to books in file
-   */
-  getIndex(fileName) {
-    return (fileName) ? this.indexes[fileName] : this.indexes;
   }
 
   /**
@@ -174,15 +171,22 @@ class InvertedIndex {
    *  that contains token
    */
   searchIndex(index, fileName, ...terms) {
-    const searchedTerms = InvertedIndex.flattenArray(terms);
-    const searchResult = searchedTerms.reduce((obj, term) => {
-      const normalizedTerm = term.trim().toLowerCase().replace(/\W+/g, ' ');
-      /\w+ \w+/g.test(normalizedTerm) ?
-       obj[normalizedTerm] = InvertedIndex.multiTermSearch(normalizedTerm) :
-       obj[normalizedTerm] = index[normalizedTerm];
-      return obj;
+    const searchedIndex = (fileName) ?
+     { fileName: index[fileName] } : index;
+    return Object.keys(searchedIndex).reduce((acc, filename) => {
+      const indexObj = searchedIndex[filename];
+      const searchedTerms = InvertedIndex.flattenArray(terms);
+      const searchResult = searchedTerms.reduce((obj, term) => {
+        const normalizedTerm = term.replace(/\W+/g, ' ').trim().toLowerCase();
+        /\w+ \w+/g.test(normalizedTerm) ?
+        obj[normalizedTerm] = InvertedIndex
+        .multiTermSearch(indexObj, normalizedTerm) :
+        obj[normalizedTerm] = indexObj[normalizedTerm];
+        return obj;
+      }, {});
+      acc[filename] = searchResult;
+      return acc;
     }, {});
-    return [fileName, searchResult];
   }
 }
 
