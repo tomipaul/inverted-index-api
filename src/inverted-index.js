@@ -1,7 +1,7 @@
 /** Class representing an InvertedIndex application */
 class InvertedIndex {
   /**
-   * Create an inverted index application
+   * Create an instance of InvertedIndex
    * @constructor
    */
   constructor() {
@@ -10,9 +10,11 @@ class InvertedIndex {
 
   /**
    * assert fileContent is a non-empty valid JSON array
-   * @param {array} fileContent - Content of uploaded file
+   * @method validateFileContent
+   * @static
+   * @param {array} fileContent - Content of uploaded file; JSON array of book Objects
    * @returns {array.Boolean.<true>} [true] if fileContent is valid
-   * @returns {array} [false, invalid|empty|if fileContent is Invalid
+   * @returns {array} [false, invalid|empty|malformed] if fileContent is Invalid
    */
   static validateFileContent(fileContent) {
     if (!Array.isArray(fileContent)) {
@@ -20,31 +22,33 @@ class InvertedIndex {
     } else if (!fileContent.length) {
       return [false, 'empty'];
     }
-    return this.checkBooks(fileContent);
+    return this.validateBookObjs(fileContent);
   }
 
   /**
-   * Checks if books in fileContent are valid Objects
+   * assert book objects in JSON array is not malformed
+   * @method checkFileContent
+   * @static
    * @param {array} fileContent -Array of books in JSON file
    * @returns {array} [true] if books are valid
    * [false, 'malformed', malformedObjects] if some are malformed
    */
-  static checkBooks(fileContent) {
-    // to be name checkFileContent
+  static validateBookObjs(fileContent) {
     const isNotMalformed = fileContent.every((book) => {
-      return this.checkBook(book);
+      return this.checkBookObj(book);
     });
     return (isNotMalformed) ?
     [true] : [false, 'malformed'];
   }
 
   /**
-   * Checks if book is valid
-   * @param {Object} book -A book object in the JSON file
-   * @returns {array} - acc = [] | acc = [bookIndex]
+   * Checks if a book object is valid
+   * @method checkBookObj
+   * @static
+   * @param {Object} book -A book object in the JSON Array
+   * @returns {Boolean} -true if object is valid, false otherwise
    */
-  static checkBook(book) {
-    // to be named checkBookObjectsaz
+  static checkBookObj(book) {
     /* fileObj should have two keys - title and text
     title and text should be non-empty strings */
     if (typeof book !== 'object') {
@@ -63,21 +67,33 @@ class InvertedIndex {
   }
 
   /**
-   * normalize and tokenize book contents
-   * @param {Object} book -Book object
-   * @param {string} book.title -title of the book
-   * @param {string} book.text -text of the book
+   * normalize and tokenize text of a book Object
+   * @method analyse
+   * @static
+   * @param {Object} book -Book object with title and text properties
    * @return {array.<string>} -an arry of words in book
    */
   static analyse(book) {
-    // merge title and text of the object
-    const bookText = `${book.title} ${book.text}`;
+    const bookText = book.text;
     // change all non-word characters including '_' to ' '
-    const normalizedBookText = bookText
-    .replace(/\W+|_+/g, ' ').trim().toLowerCase();
+    const normalizedBookText = this.normalize(bookText);
     // tokenize; split normalized book text to word units
     const bookTokens = normalizedBookText.split(/\s+/);
     return bookTokens;
+  }
+
+  /**
+   * normalize a string before splitting into tokens
+   * replaces all non-word characters and underscore with spaces
+   * removes whitespaces at both ends of the string
+   * converts all characters into lowercase
+   * @method normalize
+   * @static
+   * @param {string} text -a non-empty string
+   * @returns {string} -normalized string
+   */
+  static normalize(text) {
+    return text.replace(/\W+|_+/g, ' ').trim().toLowerCase();
   }
 
   /**
@@ -95,17 +111,16 @@ class InvertedIndex {
   }
 
   /**
-   * Search for occurence of two or more words in a book
+   * Search for simultaneous occurence of two or more words in a book Object
+   * @method multiTermSearch
+   * @static
    * @param {Object} index - Index to be searched
-   * @param {string} chainedTerms - A space delimited string
-   *  of two or more words
-   * @returns {array} -An array of books where terms occur simultaneously
+   * @param {string} chainedTerms - A space delimited string of two or more terms
+   * @returns {array} -An array of book Object indexes where terms occur simultaneously
    */
   static multiTermSearch(index, chainedTerms) {
-    // 'we are here' to ['we', 'are', 'here]
     const termsArray = chainedTerms.split(' ');
     // Accumulate indexes of all terms
-    // [[0, 1], [4, 5], [5, 1]] to [0, 1, 4, 5, 5, 1]
     const indicesArray = termsArray.reduce((acc, term) => {
       const indices = index[term] || [];
       acc.push(...indices);
@@ -118,9 +133,8 @@ class InvertedIndex {
       indexCount[val] += 1 : indexCount[val] = 1;
     });
     const bookContainsAll = [];
-    /* Knowing that each index can only occur once for a term
-     if an index frequency is equal to the number of search terms
-     then each search term has the index
+    /* Each index can only occur once for a term
+     if an index frequency === number of search terms
      ===> the book at that index has all terms */
     Object.keys(indexCount).forEach((bookIndex) => {
       if (indexCount[bookIndex] === termsArray.length) {
@@ -131,7 +145,8 @@ class InvertedIndex {
   }
 
   /**
-   * create a map from words in book to indices of books that contain them
+   * create a map from words in books text to indices of books that contain them
+   * @method createIndex
    * @param {string} fileName -Name of uploaded JSON file
    * @param {array} fileContent -JSON array of book objects
    * @returns {Object.<array>} -A map from words to array of book indices
@@ -167,8 +182,8 @@ class InvertedIndex {
    * @param {Object} index -Index object that maps from filenames to indexes
    * @param {string} fileName -Name of an indexed file
    * @param {array|string} terms -Tokens to search for in index
-   * @returns {Object} -A map from token to array of Books
-   *  that contains token
+   * @returns {Object} -A map from filename to an index object that
+   *  maps from terms to array of Books' indices that contains terms
    */
   searchIndex(index, fileName, ...terms) {
     const searchedIndex = (fileName) ?
@@ -177,7 +192,7 @@ class InvertedIndex {
       const indexObj = searchedIndex[filename];
       const searchedTerms = InvertedIndex.flattenArray(terms);
       const searchResult = searchedTerms.reduce((obj, term) => {
-        const normalizedTerm = term.replace(/\W+/g, ' ').trim().toLowerCase();
+        const normalizedTerm = InvertedIndex.normalize(term);
         obj[normalizedTerm] = /\w+ \w+/g.test(normalizedTerm) ?
         InvertedIndex.multiTermSearch(indexObj, normalizedTerm) :
          indexObj[normalizedTerm] || [];
