@@ -28,6 +28,7 @@
       "requireParamDescription": false,
       "requireReturnDescription": true
     }],
+    "class-methods-use-this": ["error", {"exceptMethods": ["searchIndex"]}],
     "require-jsdoc": ["error", {
         "require": {
             "FunctionDeclaration": true,
