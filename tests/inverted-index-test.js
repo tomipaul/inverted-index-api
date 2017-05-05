@@ -8,52 +8,52 @@ import allMalformedBooks from '../fixtures/allMalformedBooks.json';
 import oneMalformedBook from '../fixtures/oneMalformedBook.json';
 
 describe('InvertedIndex class checks if file content is valid', () => {
-  describe('InvertedIndex.checkBook(acc=[], book, bookIndex)', () => {
-    it('returns [bookIndex] if book has invalid text and tile', () => {
-      expect(InvertedIndex.checkBook([], someMalformedBooks[0], 0))
-      .toEqual([0]);
+  describe('InvertedIndex.checkBookObj(book)', () => {
+    it('returns false if book has invalid text and tile', () => {
+      expect(InvertedIndex.checkBookObj(someMalformedBooks[0]))
+      .toBe(false);
     });
 
-    it('returns [bookIndex] if book has more than two keys', () => {
-      expect(InvertedIndex.checkBook([], someMalformedBooks[2], 2))
-      .toEqual([2]);
+    it('returns false if book has more than two keys', () => {
+      expect(InvertedIndex.checkBookObj(someMalformedBooks[2]))
+      .toBe(false);
     });
 
-    it('returns [bookindex] if book is an empty object', () => {
-      expect(InvertedIndex.checkBook([], someMalformedBooks[3], 3))
-      .toEqual([3]);
+    it('returns false if book is an empty object', () => {
+      expect(InvertedIndex.checkBookObj(someMalformedBooks[3]))
+      .toBe(false);
     });
 
-    it('returns [bookindex] if book does not have a text poperty', () => {
-      expect(InvertedIndex.checkBook([], someMalformedBooks[4], 4))
-      .toEqual([4]);
+    it('returns false if book does not have a text poperty', () => {
+      expect(InvertedIndex.checkBookObj(someMalformedBooks[4]))
+      .toBe(false);
     });
 
-    it('returns [bookindex] if book does not have a title poperty', () => {
-      expect(InvertedIndex.checkBook([], someMalformedBooks[5], 5))
-      .toEqual([5]);
+    it('returns false if book does not have a title poperty', () => {
+      expect(InvertedIndex.checkBookObj(someMalformedBooks[5]))
+      .toBe(false);
     });
 
-    it('returns [] if book is not malformed', () => {
-      expect(InvertedIndex.checkBook([], someMalformedBooks[1], 1))
-      .toEqual([]);
+    it('returns true if book is not malformed', () => {
+      expect(InvertedIndex.checkBookObj(someMalformedBooks[1]))
+      .toBe(true);
     });
   });
 
-  describe('InvertedIndex.checkBooks(fileContent)', () => {
-    it(`returns [false, 'malformed', [malformedBooksIndices]]
-     if some/all books in file is malformed`, () => {
-      expect(InvertedIndex.checkBooks(someMalformedBooks))
-      .toEqual([false, 'malformed', [0, 2, 3, 4, 5]]);
-      expect(InvertedIndex.checkBooks(allMalformedBooks))
-      .toEqual([false, 'malformed', [0, 1, 2]]);
-      expect(InvertedIndex.checkBooks(oneMalformedBook))
-      .toEqual([false, 'malformed', [0]]);
+  describe('InvertedIndex.validateBookObjs(fileContent)', () => {
+    it(`returns [false, 'malformed'] if some/all
+     books in file is malformed`, () => {
+      expect(InvertedIndex.validateBookObjs(someMalformedBooks))
+      .toEqual([false, 'malformed']);
+      expect(InvertedIndex.validateBookObjs(allMalformedBooks))
+      .toEqual([false, 'malformed']);
+      expect(InvertedIndex.validateBookObjs(oneMalformedBook))
+      .toEqual([false, 'malformed']);
     });
 
     it('returns [true] if all books in file is valid', () => {
-      expect(InvertedIndex.checkBooks(validFile)).toEqual([true]);
-      expect(InvertedIndex.checkBooks(anotherValidFile)).toEqual([true]);
+      expect(InvertedIndex.validateBookObjs(validFile)).toEqual([true]);
+      expect(InvertedIndex.validateBookObjs(anotherValidFile)).toEqual([true]);
     });
   });
 
@@ -67,24 +67,27 @@ describe('InvertedIndex class checks if file content is valid', () => {
      if fileContent is not valid JSON array`, () => {
       expect(InvertedIndex.validateFileContent(emptyObject))
       .toEqual([false, 'invalid']);
-      expect(InvertedIndex.validateFileContent(validFile)).toEqual([true]);
     });
 
-    it(`calls InvertedIndex.checkBooks
+    it(`calls InvertedIndex.validateBookObjs
      if fileContent is non-empty valid JSON array`, () => {
-      spyOn(InvertedIndex, 'checkBooks');
+      spyOn(InvertedIndex, 'validateBookObjs');
       InvertedIndex.validateFileContent(validFile);
       InvertedIndex.validateFileContent(allMalformedBooks);
-      expect(InvertedIndex.checkBooks).toHaveBeenCalled();
-      expect(InvertedIndex.checkBooks).toHaveBeenCalledWith(validFile);
-      expect(InvertedIndex.checkBooks).toHaveBeenCalledWith(allMalformedBooks);
+      expect(InvertedIndex.validateBookObjs)
+      .toHaveBeenCalled();
+      expect(InvertedIndex.validateBookObjs)
+      .toHaveBeenCalledWith(validFile);
+      expect(InvertedIndex.validateBookObjs)
+      .toHaveBeenCalledWith(allMalformedBooks);
     });
 
-    it(`returns InvertedIndex.checkBooks(fileContent)
+    it(`returns InvertedIndex.validateBookObjs(fileContent)
      if fileContent is non-empty valid JSON array`, () => {
+      expect(InvertedIndex.validateFileContent(validFile)).toEqual([true]);
       expect(InvertedIndex.validateFileContent(anotherValidFile)).toEqual([true]);
       expect(InvertedIndex.validateFileContent(someMalformedBooks))
-      .toEqual([false, 'malformed', [0, 2, 3, 4, 5]]);
+      .toEqual([false, 'malformed']);
     });
   });
 });
@@ -94,18 +97,18 @@ describe('Inverted index class creates an index', () => {
     it('returns an array of all words in book object', () => {
       let bookTokens = InvertedIndex.analyse(anotherValidFile[2]);
       expect(bookTokens).toEqual(
-        ['times', 'of', 'sciences', 'science', 'can',
-          'make', 'you', 'fly', 'with', 'an', 'edge']
+        ['science', 'can', 'make', 'you',
+          'fly', 'with', 'an', 'edge']
       );
-      expect(bookTokens.length).toEqual(11);
+      expect(bookTokens.length).toEqual(8);
 
       bookTokens = InvertedIndex.analyse(anotherValidFile[1]);
-      expect(bookTokens.length).toEqual(32);
+      expect(bookTokens.length).toEqual(28);
       expect(InvertedIndex.analyse(anotherValidFile[1]))
       .toContain('people');
 
       bookTokens = InvertedIndex.analyse(anotherValidFile[3]);
-      expect(bookTokens.length).toEqual(12);
+      expect(bookTokens.length).toEqual(9);
       expect(bookTokens).toContain('2045');
     });
   });
@@ -126,7 +129,7 @@ describe('Inverted index class creates an index', () => {
       .toEqual([false, 'empty']);
       expect(invertedIndex.createIndex('oneMalformedBook.json',
        oneMalformedBook))
-       .toEqual([false, 'malformed', [0]]);
+       .toEqual([false, 'malformed']);
     });
 
     it('creates and returns an index object', () => {
