@@ -57,7 +57,7 @@ gulp.task('babelifySrcFiles', () => {
   .pipe(gulp.dest('dist'));
 });
 
-gulp.task('serve', ['babelifySrcFiles'], () => {
+gulp.task('serve', () => {
   nodemon({
     script: 'dist/app.js',
     ext: 'js json html',
