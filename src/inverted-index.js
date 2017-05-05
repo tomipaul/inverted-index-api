@@ -31,26 +31,25 @@ class InvertedIndex {
    */
   static checkBooks(fileContent) {
     // to be name checkFileContent
-    const malformedObjs = fileContent.reduce((acc, book, bookIndex) => {
-      return (typeof book === 'object') ?
-      this.checkBook(acc, book, bookIndex) :
-      (acc.push(bookIndex), acc);
-    }, []);
-    return (malformedObjs.length) ?
-     [false, 'malformed', malformedObjs] : [true];
+    const isNotMalformed = fileContent.every((book) => {
+      return this.checkBook(book);
+    });
+    return (isNotMalformed) ?
+    [true] : [false, 'malformed'];
   }
 
   /**
    * Checks if book is valid
-   * @param {array} acc -Accumulator
    * @param {Object} book -A book object in the JSON file
-   * @param {*} bookIndex -Index of the book object in the array
    * @returns {array} - acc = [] | acc = [bookIndex]
    */
-  static checkBook(acc, book, bookIndex) {
-    // to be named checkBookObject
+  static checkBook(book) {
+    // to be named checkBookObjectsaz
     /* fileObj should have two keys - title and text
     title and text should be non-empty strings */
+    if (typeof book !== 'object') {
+      return false;
+    }
     const bookKeys = Object.keys(book);
     return (bookKeys.length === 2 &&
     bookKeys.includes('title') &&
@@ -60,8 +59,7 @@ class InvertedIndex {
     bookKeys.includes('text') &&
     book.text &&
     !/^(\s*|\W*)$/.test(book.text) &&
-    typeof book.text === 'string') ?
-    acc : (acc.push(bookIndex), acc);
+    typeof book.text === 'string');
   }
 
   /**
