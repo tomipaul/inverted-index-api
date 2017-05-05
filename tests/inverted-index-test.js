@@ -89,7 +89,7 @@ describe('InvertedIndex class checks if file content is valid', () => {
   });
 });
 
-describe('Inverted index class creates index', () => {
+describe('Inverted index class creates an index', () => {
   describe('InvertedIndex.analyse(book)', () => {
     it('returns an array of all words in book object', () => {
       let bookTokens = InvertedIndex.analyse(anotherValidFile[2]);
@@ -130,29 +130,92 @@ describe('Inverted index class creates index', () => {
     });
 
     it('creates and returns an index object', () => {
-      const index = invertedIndex.createIndex('anotherValidFile.json',
-       anotherValidFile);
-      expect(index.edge).toBeDefined();
-      expect(index.edge).toEqual([0, 1, 2]);
-      expect(index.fly).toBeDefined();
-      expect(index.fly).toEqual([1, 2]);
+      const fileIndex = invertedIndex.createIndex('anotherValidFile.json',
+       anotherValidFile)['anotherValidFile.json'];
+      expect(fileIndex.edge).toBeDefined();
+      expect(fileIndex.edge).toEqual([0, 1, 2]);
+      expect(fileIndex.fly).toBeDefined();
+      expect(fileIndex.fly).toEqual([1, 2]);
     });
 
     it('creates and returns an index object', () => {
-      const index = invertedIndex.createIndex('validFile.json',
-       validFile);
-      expect(index.animals).toBeDefined();
-      expect(index.animals).toEqual([0, 1]);
-      expect(index.system).toBeDefined();
-      expect(index.system).toEqual([1, 2]);
+      const fileIndex = invertedIndex.createIndex('validFile.json',
+       validFile)['validFile.json'];
+      expect(fileIndex.animals).toBeDefined();
+      expect(fileIndex.animals).toEqual([0, 1]);
+      expect(fileIndex.system).toBeDefined();
+      expect(fileIndex.system).toEqual([1, 2]);
+      expect(fileIndex.the).toBeDefined();
+      expect(fileIndex.the.length).toEqual(validFile.length);
+    });
+  });
+});
+
+describe('Inverted Index class searches an index for term(s)', () => {
+  describe('InvertedIndex.flattenArray(nestedArray)', () => {
+    it(`takes a multidimensional array of search terms 
+    and returns a one dimensional array`, () => {
+      expect(InvertedIndex
+      .flattenArray([[1, 2, 3], [[[[[4, 5], 'a', 'b']]], ['x'], 'y']]))
+      .toEqual([1, 2, 3, 4, 5, 'a', 'b', 'x', 'y']);
     });
 
-    it('creates and returns an index object', () => {
-      const index = invertedIndex.createIndex('validFile.json',
-       validFile);
-      Object.keys(index).forEach((item) => {
-        expect(index[item].includes(3)).toBeFalsy();
-      });
+    it(`takes a multidimensional array of search terms
+     and returns a one dimensional array`, () => {
+      expect(InvertedIndex
+      .flattenArray(['man', [['the'], ['there', 'for']]]))
+      .toEqual(['man', 'the', 'there', 'for']);
+    });
+  });
+
+  describe('invertedIndex.searchIndex(index, fileName, ...terms)', () => {
+    const invertedIndex = new InvertedIndex();
+    invertedIndex.createIndex('validFile.json', validFile);
+    const index = invertedIndex.createIndex('anotherValidFile.json',
+      anotherValidFile);
+    it('looks up terms in the index of a file `fileName`', () => {
+      const searchResult = invertedIndex.searchIndex(index, 'validFile.json',
+       'the', ['system'], ['animals'])['validFile.json'];
+      expect(searchResult).toBeTruthy();
+      expect(searchResult.animals).toEqual([0, 1]);
+      expect(searchResult.the).toEqual([0, 1, 2]);
+      expect(searchResult.system).toEqual([1, 2]);
+    });
+
+    it('looks up terms in the index of all files if fileName is undefined',
+    () => {
+      const searchResult = invertedIndex.searchIndex(index, undefined,
+      ['and', ['fly']], ['the']);
+      const validFileResult = searchResult['validFile.json'];
+      const anotherValidFileResult = searchResult['anotherValidFile.json'];
+      expect(Object.keys(searchResult).length).toEqual(2);
+      expect(validFileResult.and).toEqual([1]);
+      expect(anotherValidFileResult.and).toEqual([1]);
+      expect(validFileResult.fly).toEqual([]);
+      expect(anotherValidFileResult.fly).toEqual([1, 2]);
+      expect(validFileResult.the).toEqual([0, 1, 2]);
+      expect(anotherValidFileResult.the).toEqual([1]);
+    });
+
+    it('looks up simultaneous terms in index of file(s)', () => {
+      const searchResult = invertedIndex.searchIndex(index, undefined,
+       ['of to'], ['the animals']);
+      const validFileResult = searchResult['validFile.json'];
+      const anotherValidFileResult = searchResult['anotherValidFile.json'];
+      expect(validFileResult['of to']).toEqual([0]);
+      expect(anotherValidFileResult['of to']).toEqual([]);
+      expect(validFileResult['the animals']).toEqual([0, 1]);
+      expect(anotherValidFileResult['the animals']).toEqual([]);
+    });
+
+    it('returns empty array for term if term is not in the index', () => {
+      const searchResult = invertedIndex.searchIndex(index,
+      'anotherValidFile.json', 'beauty', ['in', 'our'],
+       'eyes')['anotherValidFile.json'];
+      expect(searchResult.beauty).toEqual([]);
+      expect(searchResult.in).toEqual([]);
+      expect(searchResult.our).toEqual([]);
+      expect(searchResult.eyes).toEqual([]);
     });
   });
 });
