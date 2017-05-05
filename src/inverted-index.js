@@ -90,7 +90,7 @@ class InvertedIndex {
    * @returns {array} -A one dimensional array
    */
   static flattenArray(nestedArray) {
-    nestedArray.reduce((arr, item) => {
+    return nestedArray.reduce((arr, item) => {
       return arr.concat(Array.isArray(item) ?
        this.flattenArray(item) : item);
     }, []);
@@ -109,12 +109,14 @@ class InvertedIndex {
     // Accumulate indexes of all terms
     // [[0, 1], [4, 5], [5, 1]] to [0, 1, 4, 5, 5, 1]
     const indicesArray = termsArray.reduce((acc, term) => {
-      return acc.push(...index[term]);
+      const indices = index[term] || [];
+      acc.push(...indices);
+      return acc;
     }, []);
     const indexCount = {};
     // count the number of occurence of each index in indicesArray
     indicesArray.forEach((val) => {
-      Object.prototype.hasOwnProperty.call(indexCount, index) ?
+      Object.prototype.hasOwnProperty.call(indexCount, val) ?
       indexCount[val] += 1 : indexCount[val] = 1;
     });
     const bookContainsAll = [];
@@ -124,7 +126,7 @@ class InvertedIndex {
      ===> the book at that index has all terms */
     Object.keys(indexCount).forEach((bookIndex) => {
       if (indexCount[bookIndex] === termsArray.length) {
-        bookContainsAll.push(bookIndex);
+        bookContainsAll.push(parseInt(bookIndex, 10));
       }
     });
     return bookContainsAll;
@@ -147,7 +149,7 @@ class InvertedIndex {
         // for each book in the file, analyse
         InvertedIndex.analyse(book).forEach((token) => {
           // for each token in analysed book text, check and update `indexes`
-          if (token && Object.prototype.hasOwnProperty.call(index, token)) {
+          if (Object.prototype.hasOwnProperty.call(index, token)) {
             if (!index[token].includes(bookIndex)) {
               index[token].push(bookIndex);
             }
@@ -163,25 +165,24 @@ class InvertedIndex {
   }
 
   /**
-   * search for occurence of words in Books
-   * @param {Object} index -Index to be searched
-   * @param {string} fileName -Name of file that corresponds to index
+   * search for occurence of terms in an index
+   * @param {Object} index -Index object that maps from filenames to indexes
+   * @param {string} fileName -Name of an indexed file
    * @param {array|string} terms -Tokens to search for in index
    * @returns {Object} -A map from token to array of Books
    *  that contains token
    */
   searchIndex(index, fileName, ...terms) {
     const searchedIndex = (fileName) ?
-     { fileName: index[fileName] } : index;
+     { [fileName]: index[fileName] } : index;
     return Object.keys(searchedIndex).reduce((acc, filename) => {
       const indexObj = searchedIndex[filename];
       const searchedTerms = InvertedIndex.flattenArray(terms);
       const searchResult = searchedTerms.reduce((obj, term) => {
         const normalizedTerm = term.replace(/\W+/g, ' ').trim().toLowerCase();
-        /\w+ \w+/g.test(normalizedTerm) ?
-        obj[normalizedTerm] = InvertedIndex
-        .multiTermSearch(indexObj, normalizedTerm) :
-        obj[normalizedTerm] = indexObj[normalizedTerm];
+        obj[normalizedTerm] = /\w+ \w+/g.test(normalizedTerm) ?
+        InvertedIndex.multiTermSearch(indexObj, normalizedTerm) :
+         indexObj[normalizedTerm] || [];
         return obj;
       }, {});
       acc[filename] = searchResult;
