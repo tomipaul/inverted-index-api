@@ -12,6 +12,8 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 /** Class representing an InvertedIndex application */
@@ -64,27 +66,15 @@ var InvertedIndex = function () {
           });
         });
         this.indexes[fileName] = index;
-        return _extends({}, index);
+        return _extends({}, this.indexes);
       }
       return !nameIsValid ? [false, 'File name Invalid'] : contentIsValid;
     }
 
     /**
-     * gets the index object created from 'filename'
-     * @param {string} fileName -Name of file
-     * @returns {Object} -A mapping of words to books in file
-     */
-
-  }, {
-    key: 'getIndex',
-    value: function getIndex(fileName) {
-      return fileName ? this.indexes[fileName] : this.indexes;
-    }
-
-    /**
-     * search for occurence of words in Books
-     * @param {Object} index -Index to be searched
-     * @param {string} fileName -Name of file that corresponds to index
+     * search for occurence of terms in an index
+     * @param {Object} index -Index object that maps from filenames to indexes
+     * @param {string} fileName -Name of an indexed file
      * @param {array|string} terms -Tokens to search for in index
      * @returns {Object} -A map from token to array of Books
      *  that contains token
@@ -97,13 +87,18 @@ var InvertedIndex = function () {
         terms[_key - 2] = arguments[_key];
       }
 
-      var searchedTerms = InvertedIndex.flattenArray(terms);
-      var searchResult = searchedTerms.reduce(function (obj, term) {
-        var normalizedTerm = term.trim().toLowerCase().replace(/\W+/g, ' ');
-        /\w+ \w+/g.test(normalizedTerm) ? obj[normalizedTerm] = InvertedIndex.multiTermSearch(normalizedTerm) : obj[normalizedTerm] = index[normalizedTerm];
-        return obj;
+      var searchedIndex = fileName ? _defineProperty({}, fileName, index[fileName]) : index;
+      return Object.keys(searchedIndex).reduce(function (acc, filename) {
+        var indexObj = searchedIndex[filename];
+        var searchedTerms = InvertedIndex.flattenArray(terms);
+        var searchResult = searchedTerms.reduce(function (obj, term) {
+          var normalizedTerm = term.replace(/\W+/g, ' ').trim().toLowerCase();
+          obj[normalizedTerm] = /\w+ \w+/g.test(normalizedTerm) ? InvertedIndex.multiTermSearch(indexObj, normalizedTerm) : indexObj[normalizedTerm] || [];
+          return obj;
+        }, {});
+        acc[filename] = searchResult;
+        return acc;
       }, {});
-      return [fileName, searchResult];
     }
   }], [{
     key: 'validateFileContent',
@@ -128,27 +123,30 @@ var InvertedIndex = function () {
     value: function checkBooks(fileContent) {
       var _this = this;
 
-      var malformedObjs = fileContent.reduce(function (acc, book, bookIndex) {
-        return (typeof book === 'undefined' ? 'undefined' : _typeof(book)) === 'object' ? _this.checkBook(acc, book, bookIndex) : (acc.push(bookIndex), acc);
-      }, []);
-      return malformedObjs.length ? [false, 'malformed', malformedObjs] : [true];
+      // to be name checkFileContent
+      var isNotMalformed = fileContent.every(function (book) {
+        return _this.checkBook(book);
+      });
+      return isNotMalformed ? [true] : [false, 'malformed'];
     }
 
     /**
      * Checks if book is valid
-     * @param {array} acc -Accumulator
      * @param {Object} book -A book object in the JSON file
-     * @param {*} bookIndex -Index of the book object in the array
      * @returns {array} - acc = [] | acc = [bookIndex]
      */
 
   }, {
     key: 'checkBook',
-    value: function checkBook(acc, book, bookIndex) {
+    value: function checkBook(book) {
+      // to be named checkBookObjectsaz
       /* fileObj should have two keys - title and text
       title and text should be non-empty strings */
+      if ((typeof book === 'undefined' ? 'undefined' : _typeof(book)) !== 'object') {
+        return false;
+      }
       var bookKeys = Object.keys(book);
-      return bookKeys.length === 2 && bookKeys.includes('title') && book.title && typeof book.title === 'string' && bookKeys.includes('text') && book.text && typeof book.text === 'string' ? acc : (acc.push(bookIndex), acc);
+      return bookKeys.length === 2 && bookKeys.includes('title') && book.title && !/^(\s*|\W*)$/.test(book.title) && typeof book.title === 'string' && bookKeys.includes('text') && book.text && !/^(\s*|\W*)$/.test(book.text) && typeof book.text === 'string';
     }
 
     /**
@@ -172,7 +170,9 @@ var InvertedIndex = function () {
     }
 
     /**
-     * flattens array
+     * flattens an array
+     * @method flattenArray
+     * @static
      * @param {array} nestedArray -A multidimensional array
      * @returns {array} -A one dimensional array
      */
@@ -182,7 +182,7 @@ var InvertedIndex = function () {
     value: function flattenArray(nestedArray) {
       var _this2 = this;
 
-      nestedArray.reduce(function (arr, item) {
+      return nestedArray.reduce(function (arr, item) {
         return arr.concat(Array.isArray(item) ? _this2.flattenArray(item) : item);
       }, []);
     }
@@ -203,12 +203,14 @@ var InvertedIndex = function () {
       // Accumulate indexes of all terms
       // [[0, 1], [4, 5], [5, 1]] to [0, 1, 4, 5, 5, 1]
       var indicesArray = termsArray.reduce(function (acc, term) {
-        return acc.push.apply(acc, _toConsumableArray(index[term]));
+        var indices = index[term] || [];
+        acc.push.apply(acc, _toConsumableArray(indices));
+        return acc;
       }, []);
       var indexCount = {};
       // count the number of occurence of each index in indicesArray
       indicesArray.forEach(function (val) {
-        Object.prototype.hasOwnProperty.call(indexCount, index) ? indexCount[val] += 1 : indexCount[val] = 1;
+        Object.prototype.hasOwnProperty.call(indexCount, val) ? indexCount[val] += 1 : indexCount[val] = 1;
       });
       var bookContainsAll = [];
       /* Knowing that each index can only occur once for a term
@@ -217,7 +219,7 @@ var InvertedIndex = function () {
        ===> the book at that index has all terms */
       Object.keys(indexCount).forEach(function (bookIndex) {
         if (indexCount[bookIndex] === termsArray.length) {
-          bookContainsAll.push(bookIndex);
+          bookContainsAll.push(parseInt(bookIndex, 10));
         }
       });
       return bookContainsAll;
