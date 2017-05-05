@@ -57,13 +57,14 @@ gulp.task('babelifySrcFiles', () => {
   .pipe(gulp.dest('dist'));
 });
 
-gulp.task('serve', () => {
+gulp.task('serve', ['babelifySrcFiles'], () => {
   nodemon({
     script: 'dist/app.js',
     ext: 'js json html',
     ignore: [
       'node_modules/',
       '.vscode/',
+      '/dist',
       '/test',
       '/spec',
       'gulpfile.babel.js'],
