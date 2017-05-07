@@ -18,9 +18,9 @@ class InvertedIndex {
    */
   static validateFileContent(fileContent) {
     if (!Array.isArray(fileContent)) {
-      return [false, 'invalid'];
+      return [false, 'Invalid!'];
     } else if (!fileContent.length) {
-      return [false, 'empty'];
+      return [false, 'Empty!'];
     }
     return this.validateBookObjs(fileContent);
   }
@@ -38,7 +38,7 @@ class InvertedIndex {
       return this.checkBookObj(book);
     });
     return (isNotMalformed) ?
-    [true] : [false, 'malformed'];
+    [true] : [false, 'Malformed!'];
   }
 
   /**
