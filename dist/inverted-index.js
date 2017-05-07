@@ -90,7 +90,9 @@ var InvertedIndex = function () {
         terms[_key - 2] = arguments[_key];
       }
 
-      if (!terms.length) {
+      if (Array.isArray(index) || (typeof index === 'undefined' ? 'undefined' : _typeof(index)) !== 'object' || !Object.keys(index).length) {
+        return 'Invalid index Object';
+      } else if (!terms || !terms.length) {
         return 'Terms cannot be empty';
       }
       var searchedIndex = fileName ? _defineProperty({}, fileName, index[fileName]) : index;
