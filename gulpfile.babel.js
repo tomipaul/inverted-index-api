@@ -6,6 +6,7 @@ import rename from 'gulp-rename';
 import istanbul from 'gulp-babel-istanbul';
 import injectModules from 'gulp-inject-modules';
 import coveralls from 'gulp-coveralls';
+import exit from 'gulp-exit';
 
 gulp.task('pre-test', () => {
   return gulp.src('src/*.js')
@@ -16,7 +17,7 @@ gulp.task('pre-test', () => {
 });
 
 gulp.task('run-tests', ['pre-test'], () => {
-  return gulp.src('tests/inverted-index-test.js')
+  return gulp.src('tests/*.js')
   .pipe(babel({
     presets: ['es2015'],
     plugins: ['transform-object-rest-spread']
@@ -28,7 +29,8 @@ gulp.task('run-tests', ['pre-test'], () => {
     includeStackTrace: true,
     color: true
   }))
-  .pipe(istanbul.writeReports());
+  .pipe(istanbul.writeReports())
+  .pipe(exit());
 });
 
 gulp.task('babelifyTestFiles', () => {
@@ -65,8 +67,7 @@ gulp.task('serve', () => {
       'node_modules/',
       '.vscode/',
       '/dist',
-      '/test',
-      '/spec',
+      '/tests',
       'gulpfile.babel.js'],
     tasks: ['babelifySrcFiles']
   });
