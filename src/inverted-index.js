@@ -186,7 +186,10 @@ class InvertedIndex {
    *  maps from terms to array of Books' indices that contains terms
    */
   searchIndex(index, fileName, ...terms) {
-    if (!terms.length) {
+    if (Array.isArray(index) || typeof index !== 'object'
+     || !Object.keys(index).length) {
+      return 'Invalid index Object';
+    } else if (!terms || !terms.length) {
       return 'Terms cannot be empty';
     }
     const searchedIndex = (fileName) ?
