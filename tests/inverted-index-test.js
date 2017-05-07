@@ -226,5 +226,17 @@ describe('Inverted Index class searches an index for term(s)', () => {
       'anotherValidFile.json');
       expect(searchResult).toEqual('Terms cannot be empty');
     });
+
+    it('returns a message if index is not an object', () => {
+      const searchResult = invertedIndex.searchIndex([],
+      'anotherValidFile.json');
+      expect(searchResult).toEqual('Invalid index Object');
+    });
+
+    it('returns a message if index is an empty object', () => {
+      const searchResult = invertedIndex.searchIndex({},
+      'anotherValidFile.json');
+      expect(searchResult).toEqual('Invalid index Object');
+    });
   });
 });
