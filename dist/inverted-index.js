@@ -110,9 +110,9 @@ var InvertedIndex = function () {
     key: 'validateFileContent',
     value: function validateFileContent(fileContent) {
       if (!Array.isArray(fileContent)) {
-        return [false, 'invalid'];
+        return [false, 'Invalid!'];
       } else if (!fileContent.length) {
-        return [false, 'empty'];
+        return [false, 'Empty!'];
       }
       return this.validateBookObjs(fileContent);
     }
@@ -134,7 +134,7 @@ var InvertedIndex = function () {
       var isNotMalformed = fileContent.every(function (book) {
         return _this.checkBookObj(book);
       });
-      return isNotMalformed ? [true] : [false, 'malformed'];
+      return isNotMalformed ? [true] : [false, 'Malformed!'];
     }
 
     /**
