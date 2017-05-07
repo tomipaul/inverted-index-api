@@ -44,11 +44,11 @@ describe('InvertedIndex class checks if file content is valid', () => {
     it(`returns [false, 'malformed'] if some/all
      books in file is malformed`, () => {
       expect(InvertedIndex.validateBookObjs(someMalformedBooks))
-      .toEqual([false, 'malformed']);
+      .toEqual([false, 'Malformed!']);
       expect(InvertedIndex.validateBookObjs(allMalformedBooks))
-      .toEqual([false, 'malformed']);
+      .toEqual([false, 'Malformed!']);
       expect(InvertedIndex.validateBookObjs(oneMalformedBook))
-      .toEqual([false, 'malformed']);
+      .toEqual([false, 'Malformed!']);
     });
 
     it('returns [true] if all books in file is valid', () => {
@@ -60,13 +60,13 @@ describe('InvertedIndex class checks if file content is valid', () => {
   describe('InvertedIndex.validateFileContent(fileContent)', () => {
     it("returns [false, 'empty'] if fileContent is empty", () => {
       expect(InvertedIndex.validateFileContent(emptyFile))
-      .toEqual([false, 'empty']);
+      .toEqual([false, 'Empty!']);
     });
 
     it(`returns [false, 'invalid']
      if fileContent is not valid JSON array`, () => {
       expect(InvertedIndex.validateFileContent(emptyObject))
-      .toEqual([false, 'invalid']);
+      .toEqual([false, 'Invalid!']);
     });
 
     it(`calls InvertedIndex.validateBookObjs
@@ -87,7 +87,7 @@ describe('InvertedIndex class checks if file content is valid', () => {
       expect(InvertedIndex.validateFileContent(validFile)).toEqual([true]);
       expect(InvertedIndex.validateFileContent(anotherValidFile)).toEqual([true]);
       expect(InvertedIndex.validateFileContent(someMalformedBooks))
-      .toEqual([false, 'malformed']);
+      .toEqual([false, 'Malformed!']);
     });
   });
 });
@@ -124,12 +124,12 @@ describe('Inverted index class creates an index', () => {
 
     it('asserts that fileContent is valid', () => {
       expect(invertedIndex.createIndex('emptyObject.json', emptyObject))
-      .toEqual([false, 'invalid']);
+      .toEqual([false, 'Invalid!']);
       expect(invertedIndex.createIndex('emptyFile.json', emptyFile))
-      .toEqual([false, 'empty']);
+      .toEqual([false, 'Empty!']);
       expect(invertedIndex.createIndex('oneMalformedBook.json',
        oneMalformedBook))
-       .toEqual([false, 'malformed']);
+       .toEqual([false, 'Malformed!']);
     });
 
     it('creates and returns an index object', () => {
