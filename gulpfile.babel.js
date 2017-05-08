@@ -74,6 +74,5 @@ gulp.task('serve', ['babelifySrcFiles'], () => {
 
 gulp.task('coverage', ['run-tests'], () => {
   return gulp.src('coverage/lcov.info')
-  .pipe(coveralls())
-  .pipe(exit());
+  .pipe(coveralls());
 });
