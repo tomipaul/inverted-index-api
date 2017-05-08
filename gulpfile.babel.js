@@ -6,7 +6,7 @@ import rename from 'gulp-rename';
 import istanbul from 'gulp-babel-istanbul';
 import injectModules from 'gulp-inject-modules';
 import coveralls from 'gulp-coveralls';
-import exit from 'gulp-exit';
+
 
 gulp.task('pre-test', () => {
   return gulp.src('src/*.js')
