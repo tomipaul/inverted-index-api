@@ -29,8 +29,7 @@ gulp.task('run-tests', ['pre-test'], () => {
     includeStackTrace: true,
     color: true
   }))
-  .pipe(istanbul.writeReports())
-  .pipe(exit());
+  .pipe(istanbul.writeReports());
 });
 
 gulp.task('babelifyTestFiles', () => {
@@ -75,5 +74,6 @@ gulp.task('serve', ['babelifySrcFiles'], () => {
 
 gulp.task('coverage', ['run-tests'], () => {
   return gulp.src('coverage/lcov.info')
-  .pipe(coveralls());
+  .pipe(coveralls())
+  .pipe(exit());
 });
