@@ -201,7 +201,8 @@ describe('/api/search', () => {
     })
     .end((err) => {
       if (err) { return done(err); }
-      return done();
+      done();
+      return app.close();
     });
   });
 });
