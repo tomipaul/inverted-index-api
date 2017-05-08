@@ -21,9 +21,9 @@ app.use((err, req, res, next) => {
   res.status(500).send('Request could not be completed. Please try again');
 });
 routes(app);
-app.listen(port, () => {
+const server = app.listen(port, () => {
   // eslint-disable-next-line no-console
   console.log(`App listening on ${port}`);
 });
 
-export default app;
+export default server;
