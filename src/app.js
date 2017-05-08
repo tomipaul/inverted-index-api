@@ -9,7 +9,7 @@ const setPort = () => {
   } else if (process.env.NODE_ENV === 'TEST') {
     return process.env.PORT_TEST;
   }
-  return process.env.PORT_PROD;
+  return process.env.PORT_PROD || 8080;
 };
 
 dotenv.config();
