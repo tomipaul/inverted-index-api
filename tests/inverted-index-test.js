@@ -97,8 +97,14 @@ describe('Inverted index class creates an index', () => {
     it('returns an array of all words in book object', () => {
       let bookTokens = InvertedIndex.analyse(anotherValidFile[2]);
       expect(bookTokens).toEqual(
-        ['science', 'can', 'make', 'you',
-          'fly', 'with', 'an', 'edge']
+        ['science',
+          'can',
+          'make',
+          'you',
+          'fly',
+          'with',
+          'an',
+          'edge']
       );
       expect(bookTokens.length).toEqual(8);
 
@@ -159,14 +165,29 @@ describe('Inverted Index class searches an index for term(s)', () => {
     it(`takes a multidimensional array of search terms 
     and returns a one dimensional array`, () => {
       expect(InvertedIndex
-      .flattenArray([[1, 2, 3], [[[[[4, 5], 'a', 'b']]], ['x'], 'y']]))
+      .flattenArray([
+        [1, 2, 3],
+        [
+          [[[
+            [4, 5], 'a', 'b'
+          ]]],
+          ['x'],
+          'y'
+        ]
+      ]))
       .toEqual([1, 2, 3, 4, 5, 'a', 'b', 'x', 'y']);
     });
 
     it(`takes a multidimensional array of search terms
      and returns a one dimensional array`, () => {
       expect(InvertedIndex
-      .flattenArray(['man', [['the'], ['there', 'for']]]))
+      .flattenArray([
+        'man',
+        [
+          ['the'],
+          ['there', 'for']
+        ]
+      ]))
       .toEqual(['man', 'the', 'there', 'for']);
     });
   });
