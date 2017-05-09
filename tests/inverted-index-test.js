@@ -211,6 +211,20 @@ describe('Inverted Index class searches an index for term(s)', () => {
       expect(anotherValidFileResult['the animals']).toEqual([]);
     });
 
+    it('normalizes search terms before look-up', () => {
+      const searchResult = invertedIndex.searchIndex(index, undefined,
+      ['And^^^^', ['flY!^$#@']], ['tHe;&%']);
+      const validFileResult = searchResult['validFile.json'];
+      const anotherValidFileResult = searchResult['anotherValidFile.json'];
+      expect(Object.keys(searchResult).length).toEqual(2);
+      expect(validFileResult.and).toEqual([1]);
+      expect(anotherValidFileResult.and).toEqual([1]);
+      expect(validFileResult.fly).toEqual([]);
+      expect(anotherValidFileResult.fly).toEqual([1, 2]);
+      expect(validFileResult.the).toEqual([0, 1, 2]);
+      expect(anotherValidFileResult.the).toEqual([1]);
+    });
+
     it('returns empty array for term if term is not in the index', () => {
       const searchResult = invertedIndex.searchIndex(index,
       'anotherValidFile.json', 'beauty', ['in', 'our'],
