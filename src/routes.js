@@ -8,7 +8,7 @@ import InvertedIndex from './inverted-index';
  */
 const apiEndPoints = function apiEndpoints(app) {
   const invertedIndex = new InvertedIndex();
-  app.post('/api/create', (req, res) => {
+  app.post('/api/v0/create', (req, res) => {
     const { fileName, fileContent } = req.body;
     const index = invertedIndex.createIndex(fileName, fileContent);
     if (Array.isArray(index)) {
@@ -17,7 +17,7 @@ const apiEndPoints = function apiEndpoints(app) {
     return res.status(200).json(index);
   });
 
-  app.post('/api/search', (req, res) => {
+  app.post('/api/v0/search', (req, res) => {
     const { index, fileName, terms } = req.body;
     const termsArray = (terms) ? terms.split(', ') : [];
     const searchResult = invertedIndex.searchIndex(index,

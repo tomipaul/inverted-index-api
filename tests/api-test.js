@@ -8,11 +8,11 @@ import anotherValidFile from '../fixtures/anotherValidFile.json';
 
 let indexes;
 
-describe('/api/create', () => {
+describe('/api/v0/create', () => {
   it('takes fileName and fileContent and returns an index object',
   (done) => {
     request(app)
-     .post('/api/create')
+     .post('/api/v0/create')
      .send({ fileName: 'validFile.json' })
      .send({ fileContent: validFile })
      .expect(200)
@@ -32,7 +32,7 @@ describe('/api/create', () => {
 
   it('returns error if fileName is not valid', (done) => {
     request(app)
-    .post('/api/create')
+    .post('/api/v0/create')
     .send({ fileName: 'badFileName.txt' })
     .send({ fileContent: validFile })
     .expect(400)
@@ -47,7 +47,7 @@ describe('/api/create', () => {
 
   it('returns error if fileContent is an empty array', (done) => {
     request(app)
-    .post('/api/create')
+    .post('/api/v0/create')
     .send({ fileName: 'emptyFile.json' })
     .send({ fileContent: emptyFile })
     .expect(400)
@@ -62,7 +62,7 @@ describe('/api/create', () => {
 
   it('returns error if fileContent is an not an array', (done) => {
     request(app)
-    .post('/api/create')
+    .post('/api/v0/create')
     .send({ fileName: 'emptyObject.json' })
     .send({ fileContent: emptyObject })
     .expect(400)
@@ -77,7 +77,7 @@ describe('/api/create', () => {
 
   it('returns error if fileContent has malformed objects', (done) => {
     request(app)
-    .post('/api/create')
+    .post('/api/v0/create')
     .send({ fileName: 'someMalformedBooks.json' })
     .send({ fileContent: someMalformedBooks })
     .expect(400)
@@ -93,7 +93,7 @@ describe('/api/create', () => {
   it('creates and returns index for multiple files',
   (done) => {
     request(app)
-     .post('/api/create')
+     .post('/api/v0/create')
      .send({ fileName: 'anotherValidFile.json' })
      .send({ fileContent: anotherValidFile })
      .expect(200)
@@ -114,11 +114,11 @@ describe('/api/create', () => {
   });
 });
 
-describe('/api/search', () => {
+describe('/api/v0/search', () => {
   it(`takes index, filename and search terms and returns
    result for terms in index of file 'fileName'`, (done) => {
     request(app)
-    .post('/api/search')
+    .post('/api/v0/search')
     .send({ index: indexes })
     .send({ fileName: 'validFile.json' })
     .send({ terms: 'system, animals, the' })
@@ -140,7 +140,7 @@ describe('/api/search', () => {
   it(`returns result for search terms in indexes of all files
    if 'fileName' is undefined`, (done) => {
     request(app)
-    .post('/api/search')
+    .post('/api/v0/search')
     .send({ index: indexes })
     .send({ terms: 'to, the' })
     .expect(200)
@@ -162,7 +162,7 @@ describe('/api/search', () => {
 
   it('returns error if search terms is empty', (done) => {
     request(app)
-    .post('/api/search')
+    .post('/api/v0/search')
     .send({ index: indexes })
     .send({ fileName: 'validFile.json' })
     .expect(400)
@@ -177,7 +177,7 @@ describe('/api/search', () => {
 
   it('returns error if index is not an object', (done) => {
     request(app)
-    .post('/api/search')
+    .post('/api/v0/search')
     .send({ index: [] })
     .send({ fileName: 'validFile.json' })
     .expect(400)
@@ -192,7 +192,7 @@ describe('/api/search', () => {
 
   it('returns error if index is an empty object', (done) => {
     request(app)
-    .post('/api/search')
+    .post('/api/v0/search')
     .send({ index: {} })
     .send({ fileName: 'validFile.json' })
     .expect(400)
