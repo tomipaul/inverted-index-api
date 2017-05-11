@@ -43,14 +43,14 @@ class InvertedIndex {
 
   /**
    * Checks if a book object is valid
+   * A book object should have two keys; title and text
+   * The title and text should be non-empty strings
    * @method checkBookObj
    * @static
    * @param {Object} book -A book object in the JSON Array
    * @returns {Boolean} -true if object is valid, false otherwise
    */
   static checkBookObj(book) {
-    /* fileObj should have two keys - title and text
-    title and text should be non-empty strings */
     if (typeof book !== 'object') {
       return false;
     }
@@ -75,9 +75,7 @@ class InvertedIndex {
    */
   static analyse(book) {
     const bookText = book.text;
-    // change all non-word characters including '_' to ' '
     const normalizedBookText = this.normalize(bookText);
-    // tokenize; split normalized book text to word units
     const bookTokens = normalizedBookText.split(/\s+/);
     return bookTokens;
   }
@@ -120,22 +118,17 @@ class InvertedIndex {
    */
   static multiTermSearch(index, chainedTerms) {
     const termsArray = chainedTerms.split(' ');
-    // Accumulate indexes of all terms
     const indicesArray = termsArray.reduce((acc, term) => {
       const indices = index[term] || [];
       acc.push(...indices);
       return acc;
     }, []);
     const indexCount = {};
-    // count the number of occurence of each index in indicesArray
     indicesArray.forEach((val) => {
       Object.prototype.hasOwnProperty.call(indexCount, val) ?
       indexCount[val] += 1 : indexCount[val] = 1;
     });
     const bookContainsAll = [];
-    /* Each index can only occur once for a term
-     if an index frequency === number of search terms
-     ===> the book at that index has all terms */
     Object.keys(indexCount).forEach((bookIndex) => {
       if (indexCount[bookIndex] === termsArray.length) {
         bookContainsAll.push(parseInt(bookIndex, 10));
@@ -152,16 +145,13 @@ class InvertedIndex {
    * @returns {Object.<array>} -A map from words to array of book indices
    */
   createIndex(fileName, fileContent) {
-    // Check if file is valid
     const nameIsValid = (typeof fileName === 'string'
      && /^\w+.json$/i.test(fileName));
     const contentIsValid = InvertedIndex.validateFileContent(fileContent);
     if (nameIsValid && contentIsValid[0]) {
       const index = {};
       fileContent.forEach((book, bookIndex) => {
-        // for each book in the file, analyse
         InvertedIndex.analyse(book).forEach((token) => {
-          // for each token in analysed book text, check and update `indexes`
           if (Object.prototype.hasOwnProperty.call(index, token)) {
             if (!index[token].includes(bookIndex)) {
               index[token].push(bookIndex);
