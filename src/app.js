@@ -16,6 +16,10 @@ dotenv.config();
 const app = express();
 const port = setPort();
 app.use(bodyParser.json());
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  next();
+});
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   res.status(500).send('Request could not be completed. Please try again');
