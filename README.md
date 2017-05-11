@@ -506,6 +506,10 @@
   Lines        : 96.04% ( 97/101 )
   ================================================================================
   ```
+
+## limitations
+- It accepts only JSON files with valid JSON array
+
 ## Contributions
 **Contributions are welcome.** [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/tomipaul/inverted-index-api/issues)
 1. Fork this repositry.
