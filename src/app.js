@@ -18,6 +18,10 @@ const port = setPort();
 app.use(bodyParser.json());
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods',
+   'PUT, GET, POST, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', `accept, content-type,
+   x-parse-application-id, x-parse-rest-api-key, x-parse-session-token`);
   next();
 });
 // eslint-disable-next-line no-unused-vars
