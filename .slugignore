@@ -1,0 +1,5 @@
+# Ignore tests
+tests
+
+# Ignore dummy files
+fixtures
