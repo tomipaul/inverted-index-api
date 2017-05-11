@@ -24,11 +24,11 @@ app.use((req, res, next) => {
    x-parse-application-id, x-parse-rest-api-key, x-parse-session-token`);
   next();
 });
+routes(app);
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   res.status(500).send('Request could not be completed. Please try again');
 });
-routes(app);
 const server = app.listen(port, () => {
   // eslint-disable-next-line no-console
   console.log(`App listening on ${port}`);
