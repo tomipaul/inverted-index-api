@@ -8,6 +8,7 @@
   * Allow users to search index for terms
 
 ## How it works
+You can check out the online version at https://inverted-index-api.herokuapp.com
 *  **`inverted-index-api`** exposes two endpoints
   * api/v0/create - takes file name and file content and returns an index
     * file name is a string which represents the name of the file e.g `book1.json`
@@ -441,6 +442,7 @@
     *  **[gulp-rename](https://github.com/hparra/gulp-rename)**
 
 ## Installation and setup
+You can use the online version at https://inverted-index-api.herokuapp.com
 *  Install **[Node.js](https://nodejs.org/en/download/)**
 *  Install gulp-cli globally using `npm install -g gulp-cli`
 *  Navigate to a directory of choice on `terminal`.
