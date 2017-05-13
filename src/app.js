@@ -8,8 +8,10 @@ const setPort = () => {
     return process.env.PORT_DEV;
   } else if (process.env.NODE_ENV === 'TEST') {
     return process.env.PORT_TEST;
+  } else if (process.env.NODE_ENV === 'PROD') {
+    return process.env.PORT_PROD;
   }
-  return process.env.PORT_PROD || process.env.PORT;
+  return process.env.PORT || 8080;
 };
 
 dotenv.config();
